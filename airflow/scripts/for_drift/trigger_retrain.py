@@ -1,0 +1,31 @@
+from airflow.decorators import task
+
+@task
+def trigger_retrain_task(drift_detected: bool, perf_result: dict):
+    import requests
+    import json
+    import os
+    import sys
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+    if drift_detected or perf_result["performance_drop"] or perf_result["below_threshold"]:
+        airflow_url = "http://airflow:8080/api/v1/dags/drift_detection_pipeline_retarin/dagRuns"
+        headers = {
+            "Authorization": "Basic YWlyZmxvdzphaXJmbG93",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "conf": {
+                "accuracy": perf_result["accuracy"],
+                "drift_detected": drift_detected,
+                "below_threshold": perf_result["below_threshold"]
+            }
+        }
+
+        response = requests.post(airflow_url, json=payload, headers=headers)
+        print(f"Triggered retrain DAG - status: {response.status_code}")
+        return response.ok
+    else:
+        print("No need to retrain. Everything is good.")
+        return False

@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+scikit-learn
+catboost
+pandas
+joblib
+mlflow
+psycopg2-binary
+prometheus_fastapi_instrumentator
+evidently
+requests
+pandas
+openpyxl
+dill==0.3.8

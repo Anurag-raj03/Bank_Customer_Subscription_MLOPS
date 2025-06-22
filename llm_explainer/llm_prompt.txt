@@ -1,0 +1,10 @@
+You are an expert data analyst. Based on the following customer features and prediction, provide an explanation of why this prediction might have occurred.
+
+Explain clearly in friendly, plain English.
+
+
+
+🎯 Predicted Outcome:
+{prediction}
+
+💡 Explanation:

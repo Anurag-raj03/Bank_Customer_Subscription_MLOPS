@@ -1,0 +1,8 @@
+pandas
+openpyxl
+python-dotenv
+langchain
+openai
+tiktoken
+langchain_community
+openpyxl
