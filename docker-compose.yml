@@ -183,30 +183,7 @@ services:
     restart: on-failure
     networks:
       - tele_mlops_network 
-  dvc-runner:
-    container_name: dvc_runner
-    build:
-      context: ./scripts_dvc  
-      dockerfile: Dockerfile  
-    image: anuragraj03/tele_mlops/dvc_run:latest
-    depends_on:
-      - backend
-      - airflow
-      - drift-detector
-      - mlflow
-      - prometheus
-      - grafana
-      - llm
-    entrypoint: ["/bin/bash", "-c", "./scripts_dvc/dvc_init.sh"]
-    volumes:
-      - ./scripts_dvc:/app/scripts_dvc
-      - ./Data_kind_stack:/app/Data_kind_stack
-      - ./.dvc:/app/.dvc
-      - ./.git:/app/.git
-    working_dir: /app
-    restart: "no"
-    networks:
-      - tele_mlops_network    
+  
 
 volumes:
   postgres_data: 

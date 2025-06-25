@@ -11,6 +11,7 @@ def extraction_data(
     from sqlalchemy import create_engine
     import os
     import sys
+
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     from Database_connection.db_init import clear_table
 
@@ -21,15 +22,19 @@ def extraction_data(
         df = pd.read_sql(query, con=engine)
 
         if df.empty:
-            print(f"⚠️ Extraction Task: Table `{table_name}` in `{db_name}` has no data.")
+            print(f"Extraction Task: Table `{table_name}` in `{db_name}` has no data.")
             return None
 
         os.makedirs(os.path.dirname(extracted_data_path), exist_ok=True)
+
         df.to_csv(extracted_data_path, index=False)
-        df.to_csv(reference_drift_data, mode='a', index=False, header=not os.path.exists(reference_drift_data))
+
+        if os.path.exists(reference_drift_data) and os.path.getsize(reference_drift_data) > 0:
+            df.to_csv(reference_drift_data, mode='a', index=False, header=False)
+        else:
+            df.to_csv(reference_drift_data, mode='w', index=False, header=True)
 
         print(f"Extraction completed from `{table_name}`, saved to: {extracted_data_path}")
-
 
         clear_table(db_name, table_name)
 

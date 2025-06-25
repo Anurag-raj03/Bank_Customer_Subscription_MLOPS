@@ -1,6 +1,7 @@
 import pandas as pd
-from evidently import Report
-from evidently.presets import DataDriftPreset, DataSummaryPreset, ClassificationPreset
+from evidently.report import Report
+from evidently.metric_preset import DataDriftPreset, DataQualityPreset, ClassificationPreset
+from evidently import ColumnMapping
 from datetime import datetime
 import os
 
@@ -10,21 +11,30 @@ def run_evidently_report(reference_path: str, current_path: str) -> bool:
 
     report = Report(metrics=[
         DataDriftPreset(),
-        DataSummaryPreset(),
+        DataQualityPreset(),  
         ClassificationPreset()
     ])
 
-    column_mapping = {
-        "target": "y"
-    }
+    column_mapping = ColumnMapping(
+        target='y',
+        prediction='y',
+        pos_label='yes'
+    )
 
     report.run(reference_data=reference, current_data=current, column_mapping=column_mapping)
 
-    os.makedirs("drift_reports", exist_ok=True)
+   
+    os.makedirs("Drift_Detector/drift_reports", exist_ok=True)
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = f"drift_reports/drift_report_{run_id}.html"
+    output_path = f"Drift_Detector/drift_reports/drift_report_{run_id}.html"
+
     report.save_html(output_path)
     print(f"Drift report saved to: {output_path}")
 
-    drift_detected = report.as_dict()["metrics"][0]["result"].get("dataset_drift", False)
+    try:
+        drift_detected = report.as_dict()["metrics"][0]["result"].get("dataset_drift", False)
+    except Exception as e:
+        print(f"Error checking drift: {e}")
+        drift_detected = False
+
     return drift_detected

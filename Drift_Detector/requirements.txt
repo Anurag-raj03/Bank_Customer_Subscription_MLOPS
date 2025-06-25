@@ -7,7 +7,7 @@ joblib
 mlflow
 psycopg2-binary
 prometheus_fastapi_instrumentator
-evidently
+evidently==0.3.2
 requests
 pandas
 openpyxl

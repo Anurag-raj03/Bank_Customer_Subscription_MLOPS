@@ -1,4 +1,4 @@
-evidently==0.7.7
+evidently==0.3.2
 pandas
 apache-airflow==2.7.0
 scikit-learn==1.4.0

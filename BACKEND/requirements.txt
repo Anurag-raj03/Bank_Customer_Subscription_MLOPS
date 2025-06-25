@@ -12,3 +12,4 @@ openai
 langchain_community
 openpyxl
 dill==0.3.8
+dvc
