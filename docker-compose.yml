@@ -103,7 +103,7 @@ services:
   frontend:
     container_name: frontend
     build:
-      context: ./frontend
+      context: ./FRONTEND
       dockerfile: Dockerfile.frontend
     image: anuragraj03/tele_mlops/frontend_run:latest
     ports:
