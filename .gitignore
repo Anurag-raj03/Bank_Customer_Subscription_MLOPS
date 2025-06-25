@@ -27,7 +27,7 @@ venv/
 myenv/
 
 # DVC/Artifacts
-
+artifacts/
 .mlflow/
 .dvc/
 .dvc/cache/
