@@ -1,4 +1,3 @@
-Absolutely! Here's your **enhanced and professional `README.md`** with detailed structure, clear tool usage, PostgreSQL info, CI/CD via DockerHub, and all important integrations like Airflow, MLflow, DVC, and LLMs.
 
 ---
 
@@ -164,19 +163,74 @@ docker-compose up --build
 
 ## ⚙️ Flow Diagram (Text)
 
+
+---
+
+### 🔁 **MLOps Workflow Diagram (Mermaid)**
+
 ```mermaid
-graph LR
-A[Raw Data] --> B[Data Cleaning - Airflow]
-B --> C{Drift Detected?}
-C -->|Yes| D[Trigger Retrain - retrain_dag]
-D --> E[Model Registry - MLflow]
-E --> F[Serve via FastAPI]
+graph TD
 
-C -->|No| G[Continue Predictions]
+%% Initial Stage - Data Processing from src folder
+A1[Raw Data] --> A2[Preprocessing - src/]
+A2 --> A3[Data Ingestion - src/]
+A3 --> A4[Model Training - src/]
+A4 --> A5[Register Model + Artifacts - MLflow]
 
-F --> H[UI - Streamlit]
-H --> I[User Gets Prediction + LLM Explanation]
+%% FastAPI Serving
+A5 --> B1[Serve Model via FastAPI]
+
+%% Streamlit Interaction
+B1 --> C1[UI - Streamlit App]
+C1 --> C2[User Enters New Data]
+C2 --> C3[New Data Stored in PostgreSQL]
+
+%% Airflow ETL + Retrain
+C3 --> D1[Trigger Airflow DAG - etl_retarin_dag]
+D1 --> D2[Extract Script]
+D2 --> D3[Transform Script]
+D3 --> D4[Load Script]
+D4 --> D5[Retrain Script]
+D5 --> A5
+
+%% Drift Detection DAG
+C3 --> E1[Airflow DAG - drift_dag]
+E1 --> E2{Drift Detected?}
+E2 -->|Yes| D1
+E2 -->|No| F1[Continue Serving]
+
+%% Monitoring Stack
+B1 --> G1[Prometheus + Grafana - Real-time Monitoring]
+E1 --> G1
+
+%% CI/CD Automation
+H1[GitHub Actions CI Pipeline]
+H1 --> H2[Build & Test]
+H2 --> H3[Push Docker Image to DockerHub]
+H3 --> B1
+
+%% Output + Explainability
+C1 --> I1[Prediction Output + LLM Explainer]
 ```
+
+---
+
+### ✅ Key Components Mapped:
+
+| Block                       | Description                                                             |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `src/`                      | Handles all initial processing: cleaning, training, registering         |
+| `FastAPI`                   | Exposes trained model as REST API                                       |
+| `Streamlit`                 | UI for input & visual feedback                                          |
+| `PostgreSQL`                | Stores incoming user data                                               |
+| `Airflow - etl_retarin_dag` | Handles ETL + retraining pipeline                                       |
+| `Airflow - drift_dag`       | Detects data drift and triggers retraining if needed                    |
+| `MLflow`                    | Stores model versions and artifacts                                     |
+| `Prometheus + Grafana`      | Monitors pipeline and model behavior                                    |
+| `GitHub Actions`            | Automates CI: test, build, and push Docker images to DockerHub          |
+| `LLM Explainer`             | Generates interpretable model explanations using OpenAI or similar LLMs |
+
+
 
 ---
 
