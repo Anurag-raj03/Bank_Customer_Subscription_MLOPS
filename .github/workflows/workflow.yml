@@ -43,7 +43,7 @@ jobs:
           docker tag anuragraj03/tele_mlops/src_run:latest anuragraj03/tele_mlops:src_run
           docker tag anuragraj03/tele_mlops/llm_run:latest anuragraj03/tele_mlops:llm_run
           docker tag anuragraj03/tele_mlops/drift_detector_run:latest anuragraj03/tele_mlops:drift_detector_run
-          docker tag anuragraj03/tele_mlops/dvc_run:latest anuragraj03/tele_mlops:dvc_run
+          
 
           docker push anuragraj03/tele_mlops:custom-airflow
           docker push anuragraj03/tele_mlops:backend_process
@@ -51,7 +51,7 @@ jobs:
           docker push anuragraj03/tele_mlops:src_run
           docker push anuragraj03/tele_mlops:llm_run
           docker push anuragraj03/tele_mlops:drift_detector_run
-          docker push anuragraj03/tele_mlops:dvc_run
+          
 
       # - name: Deploy to EC2 via SSH
       #   uses: appleboy/ssh-action@v1.0.3
@@ -75,7 +75,7 @@ jobs:
       #       docker pull anuragraj03/tele_mlops:src_run
       #       docker pull anuragraj03/tele_mlops:llm_run
       #       docker pull anuragraj03/tele_mlops:drift_detector_run
-      #       docker pull anuragraj03/tele_mlops:dvc_run
+   
 
       #       echo "🚀 Restarting containers..."
       #       docker compose up -d --remove-orphans
