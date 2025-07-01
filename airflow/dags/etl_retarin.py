@@ -23,7 +23,7 @@ with DAG (
     dag_id='bank_subscriber_etl_retrain_pipeline',
     default_args=default_args,
     description="Bank Subscribe ETL Retrainig Pipeline for the BANK using AIRFLOW",
-    schedule_interval='@hourly',
+    schedule_interval=None,
     catchup=False,
     tags=["bank","etl_retarin"]
 ) as dag:

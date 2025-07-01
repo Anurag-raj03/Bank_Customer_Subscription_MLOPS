@@ -1,0 +1,24 @@
+FROM python:3.11
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y \
+    netcat-openbsd \
+    dos2unix \
+    && apt-get clean
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ../Data_kind_stack /app/Data_kind_stack      
+COPY . /app/                                       
+
+RUN dos2unix BACKEND/multiple_command.sh && chmod +x BACKEND/multiple_command.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["bash", "multiple_command.sh"]

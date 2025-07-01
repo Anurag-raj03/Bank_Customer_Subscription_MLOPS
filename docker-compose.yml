@@ -57,7 +57,7 @@ services:
   backend:
     container_name: backend
     build:
-      context: ./BACKEND
+      context: .
       dockerfile: Dockerfile.backend
     image: anuragraj03/tele_mlops/backend_process:latest
     ports:

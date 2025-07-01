@@ -6,6 +6,8 @@ st.title("📊 Bank Marketing Prediction & Explanation")
 
 if "prediction_result" not in st.session_state:
     st.session_state.prediction_result = None
+if "last_record" not in st.session_state:
+    st.session_state.last_record = None
 if "explanation" not in st.session_state:
     st.session_state.explanation = None
 
@@ -56,18 +58,35 @@ if submitted:
     }
 
     try:
-        response = requests.post("http://backend:8000/explain", json=data)
+        response = requests.post("http://backend:8000/predict", json=data)
         if response.status_code == 200:
             result = response.json()
             st.session_state.prediction_result = result.get("prediction", None)
-            st.session_state.explanation = result.get("explanation", None)
+            st.session_state.last_record = result.get("last_inserted_record", None)
         else:
             st.error(f"Prediction failed: {response.text}")
     except Exception as e:
         st.error(f"Could not connect to the backend: {e}")
 
+# Show prediction result
 if st.session_state.prediction_result is not None:
     st.success(f"🎯 Predicted Outcome: {st.session_state.prediction_result}")
-    if st.button("🧠 Show Explanation"):
-        st.markdown("### Explanation")
-        st.info(st.session_state.explanation)
+
+# Show debug/DB insertion status
+if st.session_state.last_record is not None:
+    st.markdown("### ✅ Debug Info: Last Inserted Record")
+    st.code(st.session_state.last_record)
+
+# Optional: Call /explain endpoint if needed
+if st.button("🧠 Show Explanation"):
+    try:
+        explain_response = requests.post("http://backend:8000/explain", json=data)
+        if explain_response.status_code == 200:
+            explanation = explain_response.json().get("explanation", None)
+            st.session_state.explanation = explanation
+            st.markdown("### Explanation")
+            st.info(explanation)
+        else:
+            st.error("Explanation failed.")
+    except Exception as e:
+        st.error(f"Explanation error: {e}")

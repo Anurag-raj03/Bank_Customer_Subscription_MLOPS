@@ -6,6 +6,7 @@ def extraction_data(
     table_name: str,
     extracted_data_path="Data_kind_stack/extracted_data/extract_data.csv",
     reference_drift_data="Data_kind_stack/extracted_data/reference_drift_data.csv"
+    
 ):
     import pandas as pd
     from sqlalchemy import create_engine

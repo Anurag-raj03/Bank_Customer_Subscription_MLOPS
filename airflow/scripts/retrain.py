@@ -79,7 +79,10 @@ def retrain_task(
             mlflow.log_param("SMOTE_applied", True)
 
             example_input_df = pd.read_csv(example_input_path)
+            if 'Unnamed: 0' in example_input_df.columns:
+                example_input_df = example_input_df.drop(columns=['Unnamed: 0'])
             example_output = model.predict(example_input_df)
+            
             signature = infer_signature(example_input_df, example_output)
 
             mlflow.sklearn.log_model(

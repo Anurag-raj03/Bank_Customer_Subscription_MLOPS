@@ -6,6 +6,7 @@ table1 = "temp_table_new_costumer"
 table2 = "banking_new_data_history"
 table3 = "new_data_preprocess_table"
 
+
 MAX_RETRIES = 10
 for attempt in range(MAX_RETRIES):
     try:
@@ -13,7 +14,7 @@ for attempt in range(MAX_RETRIES):
         create_database(db_name)
         create_table(db_name, table1)
         create_table(db_name, table2)
-        create_table(db_name, table3)
+
         print("Database and tables created successfully.")
         
         break

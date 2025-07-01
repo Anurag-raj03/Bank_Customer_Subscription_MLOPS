@@ -19,7 +19,7 @@ with DAG(
     dag_id="drift_monitoring_pipeline",
     default_args=default_args,
     description="Checks drift and accuracy drop to trigger retraining",
-    schedule_interval="@hourly",
+    schedule_interval=None,
     catchup=False,
     tags=["drift", "monitoring", "retraining"]
 ) as dag:

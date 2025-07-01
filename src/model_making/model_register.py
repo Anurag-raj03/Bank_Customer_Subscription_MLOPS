@@ -26,7 +26,6 @@ def register_model():
     run_id = latest_run.info.run_id
     print(f"🔍 Latest run ID: {run_id}")
 
-    # Check for RandomForest model directory in artifacts
     artifacts = client.list_artifacts(run_id)
     artifact_paths = [artifact.path for artifact in artifacts]
 

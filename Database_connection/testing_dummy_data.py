@@ -1,10 +1,8 @@
 from db_init import insert_subscriber
 
-# Database and table name
 DB_NAME = "banking_costumer_data"
 TABLE_NAME = "temp_table_new_costumer"
 
-# Dummy test record — must match the columns in exact order!
 dummy_record = {
     'age': 32,
     'job': 'admin.',
