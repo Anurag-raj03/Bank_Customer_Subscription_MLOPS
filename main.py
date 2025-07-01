@@ -130,10 +130,11 @@ def make_prediction(data: InputData, background_tasks: BackgroundTasks):
 @app.post("/explain")
 def explain_prediction(data: InputData):
     try:
-        input_dict = data.dict()
-        preprocessed_df = preprocess_input(input_dict, label_encoder, scaler)
+        last_row_df = pd.read_csv(raw_storage_path).tail(1)
+        last_row_dict = last_row_df.to_dict(orient="records")[0]
+        preprocessed_df = preprocess_input(last_row_dict, label_encoder, scaler)
         prediction = predicts(preprocessed_df, model)
-        explanation = generate_explanation(input_dict, prediction)
+        explanation = generate_explanation(last_row_dict, prediction)
         return {
             "prediction": "yes" if prediction == 1 else "no",
             "explanation": explanation
