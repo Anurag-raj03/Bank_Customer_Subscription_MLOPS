@@ -4,12 +4,13 @@ import requests
 st.set_page_config(page_title="Bank Marketing Predictor", layout="centered")
 st.title("📊 Bank Marketing Prediction & Explanation")
 
+# Initialize session state
 if "prediction_result" not in st.session_state:
     st.session_state.prediction_result = None
-if "last_record" not in st.session_state:
-    st.session_state.last_record = None
 if "explanation" not in st.session_state:
     st.session_state.explanation = None
+if "last_input_data" not in st.session_state:
+    st.session_state.last_input_data = None
 
 with st.form("user_form"):
     age = st.number_input("Age", min_value=18, max_value=100, value=30)
@@ -38,7 +39,7 @@ with st.form("user_form"):
     submitted = st.form_submit_button("🔍 Predict")
 
 if submitted:
-    data = {
+    input_data = {
         "age": age,
         "job": job,
         "marital": marital,
@@ -58,35 +59,38 @@ if submitted:
     }
 
     try:
-        response = requests.post("http://backend:8000/predict", json=data)
+        response = requests.post("http://backend:8000/explain", json=input_data)
         if response.status_code == 200:
             result = response.json()
-            st.session_state.prediction_result = result.get("prediction", None)
-            st.session_state.last_record = result.get("last_inserted_record", None)
+            st.session_state.prediction_result = result.get("prediction")
+            st.session_state.explanation = result.get("explanation")
+            st.session_state.last_input_data = input_data
         else:
             st.error(f"Prediction failed: {response.text}")
     except Exception as e:
-        st.error(f"Could not connect to the backend: {e}")
+        st.error(f"Could not connect to backend: {e}")
 
-# Show prediction result
+# Display results
 if st.session_state.prediction_result is not None:
     st.success(f"🎯 Predicted Outcome: {st.session_state.prediction_result}")
 
-# Show debug/DB insertion status
-if st.session_state.last_record is not None:
-    st.markdown("### ✅ Debug Info: Last Inserted Record")
-    st.code(st.session_state.last_record)
-
-# Optional: Call /explain endpoint if needed
-if st.button("🧠 Show Explanation"):
-    try:
-        explain_response = requests.post("http://backend:8000/explain", json=data)
-        if explain_response.status_code == 200:
-            explanation = explain_response.json().get("explanation", None)
-            st.session_state.explanation = explanation
+    if st.button("🧠 Show Explanation"):
+        if st.session_state.explanation:
             st.markdown("### Explanation")
-            st.info(explanation)
+            st.info(st.session_state.explanation)
         else:
-            st.error("Explanation failed.")
-    except Exception as e:
-        st.error(f"Explanation error: {e}")
+            try:
+                last_data = st.session_state.get("last_input_data")
+                if last_data:
+                    exp_response = requests.post("http://backend:8000/explain", json=last_data)
+                    if exp_response.status_code == 200:
+                        explanation_text = exp_response.json().get("explanation")
+                        st.session_state.explanation = explanation_text
+                        st.markdown("### Explanation")
+                        st.info(explanation_text)
+                    else:
+                        st.error(f"Explanation request failed: {exp_response.text}")
+                else:
+                    st.warning("No saved input data found for explanation.")
+            except Exception as e:
+                st.error(f"Explanation error: {e}")

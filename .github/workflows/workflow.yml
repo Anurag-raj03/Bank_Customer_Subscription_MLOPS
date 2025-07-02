@@ -53,29 +53,29 @@ jobs:
           docker push anuragraj03/tele_mlops:drift_detector_run
           
 
-      # - name: Deploy to EC2 via SSH
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   with:
-      #     host: ${{ secrets.EC2_HOST }}
-      #     username: ${{ secrets.EC2_USER }}
-      #     key: ${{ secrets.EC2_SSH_KEY }}
-      #     script: |
-      #       cd ~/tele_mlops_project
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/tele_mlops_project
 
-      #       echo "Pulling latest code..."
-      #       git pull origin main
+            echo "Pulling latest code..."
+            git pull origin main
 
-      #       echo "Cleaning old containers..."
-      #       docker compose down
+            echo "Cleaning old containers..."
+            docker compose down
 
-      #       echo "Pulling updated images..."
-      #       docker pull anuragraj03/tele_mlops:custom-airflow
-      #       docker pull anuragraj03/tele_mlops:backend_process
-      #       docker pull anuragraj03/tele_mlops:frontend_run
-      #       docker pull anuragraj03/tele_mlops:src_run
-      #       docker pull anuragraj03/tele_mlops:llm_run
-      #       docker pull anuragraj03/tele_mlops:drift_detector_run
+            echo "Pulling updated images..."
+            docker pull anuragraj03/tele_mlops:custom-airflow
+            docker pull anuragraj03/tele_mlops:backend_process
+            docker pull anuragraj03/tele_mlops:frontend_run
+            docker pull anuragraj03/tele_mlops:src_run
+            docker pull anuragraj03/tele_mlops:llm_run
+            docker pull anuragraj03/tele_mlops:drift_detector_run
    
 
-      #       echo "🚀 Restarting containers..."
-      #       docker compose up -d --remove-orphans
+            echo "Restarting containers..."
+            docker compose up -d --remove-orphans
