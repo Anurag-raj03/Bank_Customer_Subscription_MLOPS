@@ -1,9 +1,10 @@
 name: TELE-MLOPS CI/CD
 
 on:
-  push:
-    branches:
-      - 'main'
+  workflow_run:
+    workflows: ["Build and Push Docker Images"]
+    types:
+      - completed
 
 jobs:
   build-and-deploy:
