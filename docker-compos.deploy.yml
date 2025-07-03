@@ -1,0 +1,175 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: banking_costumer_data
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tele_mlops_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  airflow:
+    container_name: airflow
+    image: anuragraj03/tele_mlops:custom-airflow
+    environment:
+      AIRFLOW_CORE_EXECUTOR: SequentialExecutor
+      AIRFLOW_CORE_FERNET_KEY: uC1T-Hr2kGtB-E2kwM3rHbGZJWwCQ4fbJ_LzYf8cEjQ=
+      AIRFLOW_DATABASE_SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:admin@postgres:5432/banking_costumer_data
+      _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker
+      DATABASE_URL: postgresql://postgres:admin@postgres:5432/banking_costumer_data
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/scripts:/opt/airflow/scripts
+      - ./airflow/airflow.cfg:/opt/airflow/airflow.cfg
+      - ./BACKEND:/opt/airflow/BACKEND
+      - ./src:/opt/airflow/src
+      - ./Database_connection:/opt/airflow/Database_connection
+      - ./Drift_Detector:/opt/airflow/Drift_Detector
+      - ./Data_kind_stack:/opt/airflow/Data_kind_stack
+      - ./monitoring:/opt/airflow/monitoring
+      - ./artifacts:/opt/airflow/artifacts
+    command: bash allrun.sh
+    restart: on-failure
+    networks:
+      - tele_mlops_network
+    depends_on:
+      - backend
+
+  backend:
+    container_name: backend
+    image: anuragraj03/tele_mlops:backend_process
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./BACKEND:/app/BACKEND
+      - ./Database_connection:/app/Database_connection
+      - ./src:/app/src
+      - ./monitoring:/app/monitoring
+      - ./artifacts:/app/artifacts
+      - ./airflow:/app/airflow
+      - ./llm_explainer:/app/llm_explainer
+      - ./Drift_Detector:/app/Drift_Detector
+      - ./Data_kind_stack:/app/Data_kind_stack
+    environment:
+      - DATABASE_URL=postgresql://postgres:admin@postgres:5432/banking_costumer_data
+    restart: on-failure
+    networks:
+      - tele_mlops_network
+    depends_on:
+      src:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+
+  src:
+    container_name: src
+    image: anuragraj03/tele_mlops:src_run
+    volumes:
+      - ./src:/app/src
+      - ./src/model_making/main.py:/app/src/model_making/model_making.py
+      - ./src/Data_ingest/data_validations.py:/app/src/Data_ingest/data_validations.py
+      - ./artifacts:/app/artifacts
+      - ./Data_kind_stack:/app/Data_kind_stack
+      - ./src/Data/Banking_Call_Data.xlsx:/app/src/Data/Banking_Call_Data.xlsx
+    restart: on-failure
+    networks:
+      - tele_mlops_network
+
+  frontend:
+    container_name: frontend
+    image: anuragraj03/tele_mlops:frontend_run
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./FRONTEND:/app/FRONTEND
+      - ./BACKEND:/app/BACKEND
+    restart: on-failure
+    networks:
+      - tele_mlops_network
+    depends_on:
+      - backend
+
+  llm:
+    container_name: llm
+    image: anuragraj03/tele_mlops:llm_run
+    volumes:
+      - ./src:/app/src
+      - ./llm_explainer:/app/llm_explainer
+    restart: on-failure
+    networks:
+      - tele_mlops_network
+
+  drift-detector:
+    container_name: drift-detector
+    image: anuragraj03/tele_mlops:drift_detector_run
+    ports:
+      - "3001:3001"
+    depends_on:
+      - airflow
+      - mlflow
+    volumes:
+      - ./Drift_Detector:/app
+      - ./Data_kind_stack:/app/Data_kind_stack
+      - ./src:/app/src
+      - ./artifacts:/app/artifacts
+      - ./airflow:/app/airflow
+    networks:
+      - tele_mlops_network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - tele_mlops_network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - tele_mlops_network
+
+  mlflow:
+    container_name: mlflow
+    image: ghcr.io/mlflow/mlflow:latest
+    command: mlflow server --host 0.0.0.0 --port 5000
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow:/mlflow
+    restart: on-failure
+    networks:
+      - tele_mlops_network
+
+volumes:
+  postgres_data:
+
+networks:
+  tele_mlops_network:
+    driver: bridge
+    
