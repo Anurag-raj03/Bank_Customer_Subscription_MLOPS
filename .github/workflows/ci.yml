@@ -31,3 +31,9 @@ jobs:
         run: |
           docker compose -f docker-compose.build.yml build
           docker compose -f docker-compose.build.yml push
+
+      - name: Upload deploy compose file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-compose-file
+          path: docker-compose.deploy.yml
