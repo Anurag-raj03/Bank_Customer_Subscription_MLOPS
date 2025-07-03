@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
       - name: Download deployment artifact
         uses: actions/download-artifact@v4
         with:
           name: deploy-compose-file
           path: .
+
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
       - name: Upload docker-compose.deploy.yml to EC2
         uses: appleboy/scp-action@v0.1.4
