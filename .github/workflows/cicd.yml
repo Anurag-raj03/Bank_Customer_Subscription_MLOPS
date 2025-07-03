@@ -27,6 +27,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Clean up Docker space before build
+        run: |
+          echo "Cleaning Docker cache before build..."
+          docker system prune -af || true
+          docker volume prune -f || true
+          df -h
+
       - name: Build and Push Docker Images
         run: |
           docker compose -f docker-compose.build.yml build
@@ -81,8 +88,10 @@ jobs:
               sudo apt install -y docker-compose
             fi
 
-            echo "Cleaning Docker cache..."
+            echo "Cleaning Docker cache before pull..."
             docker system prune -af || true
+            docker volume prune -f || true
+            df -h
 
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
