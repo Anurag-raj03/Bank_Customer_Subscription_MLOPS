@@ -1,0 +1,38 @@
+version: '3.9'
+
+services:
+  airflow:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile.airflow
+    image: anuragraj03/tele_mlops:custom-airflow
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: anuragraj03/tele_mlops:backend_process
+
+  src:
+    build:
+      context: ./src
+      dockerfile: Dockerfile.src
+    image: anuragraj03/tele_mlops:src_run
+
+  frontend:
+    build:
+      context: ./FRONTEND
+      dockerfile: Dockerfile.frontend
+    image: anuragraj03/tele_mlops:frontend_run
+
+  llm:
+    build:
+      context: ./llm_explainer
+      dockerfile: Dockerfile.llm
+    image: anuragraj03/tele_mlops:llm_run
+
+  drift-detector:
+    build:
+      context: ./Drift_Detector
+      dockerfile: Dockerfile.drift
+    image: anuragraj03/tele_mlops:drift_detector_run
