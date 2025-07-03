@@ -23,11 +23,14 @@ services:
 
   airflow:
     container_name: airflow
-    image: anuragraj03/tele_mlops:custom-airflow
+    build: 
+      context: ./airflow
+      dockerfile: Dockerfile.airflow
+    image: anuragraj03/tele_mlops/custom-airflow:latest   
     environment:
-      AIRFLOW_CORE_EXECUTOR: SequentialExecutor
-      AIRFLOW_CORE_FERNET_KEY: uC1T-Hr2kGtB-E2kwM3rHbGZJWwCQ4fbJ_LzYf8cEjQ=
-      AIRFLOW_DATABASE_SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:admin@postgres:5432/banking_costumer_data
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__CORE__FERNET_KEY: uC1T-Hr2kGtB-E2kwM3rHbGZJWwCQ4fbJ_LzYf8cEjQ=
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:admin@postgres:5432/banking_costumer_data
       _PIP_ADDITIONAL_REQUIREMENTS: apache-airflow-providers-docker
       DATABASE_URL: postgresql://postgres:admin@postgres:5432/banking_costumer_data
     ports:
@@ -49,11 +52,14 @@ services:
     networks:
       - tele_mlops_network
     depends_on:
-      - backend
+      - backend 
 
   backend:
     container_name: backend
-    image: anuragraj03/tele_mlops:backend_process
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: anuragraj03/tele_mlops/backend_process:latest
     ports:
       - "8000:8000"
     volumes:
@@ -79,7 +85,10 @@ services:
 
   src:
     container_name: src
-    image: anuragraj03/tele_mlops:src_run
+    build: 
+      context: ./src
+      dockerfile: Dockerfile.src
+    image: anuragraj03/tele_mlops/src_run:latest
     volumes:
       - ./src:/app/src
       - ./src/model_making/main.py:/app/src/model_making/model_making.py
@@ -93,7 +102,10 @@ services:
 
   frontend:
     container_name: frontend
-    image: anuragraj03/tele_mlops:frontend_run
+    build:
+      context: ./FRONTEND
+      dockerfile: Dockerfile.frontend
+    image: anuragraj03/tele_mlops/frontend_run:latest
     ports:
       - "8501:8501"
     volumes:
@@ -107,7 +119,10 @@ services:
 
   llm:
     container_name: llm
-    image: anuragraj03/tele_mlops:llm_run
+    build:
+      context: ./llm_explainer
+      dockerfile: Dockerfile.llm
+    image: anuragraj03/tele_mlops/llm_run:latest
     volumes:
       - ./src:/app/src
       - ./llm_explainer:/app/llm_explainer
@@ -117,7 +132,10 @@ services:
 
   drift-detector:
     container_name: drift-detector
-    image: anuragraj03/tele_mlops:drift_detector_run
+    build:
+      context: ./Drift_Detector
+      dockerfile: Dockerfile.drift
+    image: anuragraj03/tele_mlops/drift_detector_run:latest  
     ports:
       - "3001:3001"
     depends_on:
@@ -165,6 +183,7 @@ services:
     restart: on-failure
     networks:
       - tele_mlops_network 
+  
 
 volumes:
   postgres_data: 
