@@ -165,7 +165,6 @@ docker-compose up --build
 
 graph TD
 
-%% Initial Stage - Data Processing from src folder
 A1[Raw Data] --> A2[Preprocessing - src/]
 A2 --> A3[Data Ingestion - src/]
 A3 --> A4[Model Training - src/]
@@ -205,6 +204,7 @@ H3 --> B1
 
 %% Output + Explainability
 C1 --> I1[Prediction Output + LLM Explainer]
+
 
 ```
 
