@@ -162,7 +162,7 @@ docker-compose up --build
 ---
 
 ## ⚙️ Flow Diagram (Text)
-
+```mermaid
 graph TD
 
 A1[Raw Data] --> A2[Preprocessing - src/]
